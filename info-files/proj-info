@@ -1,0 +1,62 @@
+Rust -> valorizada (+1/2 valores) -> eficácia
+C++/C# vibes
+Machine Learning -> bibliotecas
+
+É demasiado previsivel
+
+Jammer para drones -> ataques 
+Cenário de guerra
+
+Cloudflare -> anomalias em fluxos de dados de dimensões de dados
+ 		Detetar no inicio os ataques aos clientes
+ 			e nos DoS detetar os good clients
+Weird DNS, Weird Browsing (HTTPS)
+
+DNS (IP) tunneling
+ https://www.paloaltonetworks.com/cyberpedia/what-is-dns-tunneling
+ 
+ 
+On November 6th you will have the first evaluation moment.
+
+You have to make a short presentation about the project idea and planning, 10 minutes maximum. The presentation must include the following topics:
+
+- Identified security problem, including the importance of the security issue/solution; (7 points)
+
+- Data sources. Including the real world scenario to acquire that data; (4 points)
+
+- Test scenario or used datasets; (3 points)
+
+- Data processing (data filtering, data sampling/aggregation and observation processes) applied to raw data (planned, may change later); (3 points)
+
+- Features to extract from processed data (planned, may change later). (3 points)
+
+
+Machine Learning aplicado ao dissassembler
+Comportamentos de processos (as root, access to memory, disk, etc -> small temporal scale (por segundo, intervalos por acesso))
+
+kernel info -> there's datasets
+
+Idea: 	Detect streaming over VPN
+	DNS Tunneling
+	
+Key words: Command and Control (C&C), Exfiltration, Zero Day vulnerabilities recent	
+
+Ataques por canais já usados frequentemente.
+Botnets localmente peer2peer, não são dificeis de detetar.
+Sistemas que falam muito entre elas.
+Botnet espalhada pelo mundo -> comunicações para exterior.
+
+Deteção deste DDoS
+DDoS: analisar as maquinas comprometidas internamente (são muitas, mas geram pouco tráfego)
+
+C&C: em tudo, trafego pequeno, dominio/IP (resolução) e ver se é esquisito ou não
+Amazon servers
+
+Port Scan para ports legitimos e devagar: muito dificil de detetar
+
+Infiltration: downloads esquisitos (tamanhos, sitios, horários) cenário em que está quase tudo fechado (from dropbox) --> 
+
+Mirai attack: default parameteres fácil
+
+RAT must be hidden in case of detection systems on the system.
+In networks, we must assume it is not hidden and it's working

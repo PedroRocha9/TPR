@@ -1,0 +1,56 @@
+Delivery:
+
+RATs are typically delivered to a victim's computer through various means, including email attachments, malicious downloads, or exploiting software vulnerabilities. Once executed on the victim's machine, the RAT becomes resident in the system memory.
+Initialization:
+
+The RAT starts running on the victim's computer, often disguised as a legitimate process to avoid detection. It can also be configured to start automatically when the victim's computer boots up.
+Network Communication:
+
+The RAT actively seeks a way to communicate with the attacker's system. This is done by connecting to a predefined command and control (C2) server, typically over the Internet. The RAT initiates an outbound connection to the C2 server, which is usually controlled by the attacker.
+Command and Control (C2):
+
+Once the RAT establishes a connection with the C2 server, it awaits instructions from the attacker. The attacker uses a management interface or controller to send commands to the RAT, which are then relayed to the victim's system.
+Data Exfiltration and Control:
+
+The attacker can issue various commands to the RAT, which can include:
+Taking screenshots of the victim's desktop.
+Recording keystrokes to capture sensitive information, such as login credentials.
+Accessing and transferring files from the victim's computer.
+Activating the computer's webcam or microphone for surveillance.
+Controlling the victim's computer, like opening and closing programs, downloading and executing additional malware, or shutting down the system.
+
+
+Empresarial para fora: pesquisas, redes sociais, cloud offices (google services)
+C2 to use the RAT
+Upload and download of keystrokes, images
+Detetar streams estranhos (comparar com Teams ou Zoom (both ways video, RAT only one sided))
+Uploads mecânicas ou uploads muito seguidos - humano envia 1 pasta ou vários ficheiros com intervalos
+-----------------------------------------------------------------------------------------------------
+Detect video, great data, small data
+
+C2 por https
+
+IRC - tipo Discord
+
+Através de serviços tipo redes sociais
+
+Pequenos Kbs - Browsing simples vs KeyLogging
+Médios Mbs - Rede social com imagem e video vs images sent
+Grandes 100Mbs - Gbs - upload/download para google drive (atividade humano vs data exfiltration)
+Streaming - several picos seguidos de silêncios (zoom, youtube, etc): upload, download
+		vs. roubo de imagens
+		
+		
+Fluxos not recommended
+Packets -> Network Tap
+Pacotes de x em x tempo de cada fluxo
+SIEM Rules, anomalias nos fluxos, packets analysis -> já despoletou alarmes (que alarmes e como foram acionados) -> máquinas a serem analisadas
+
+Filtros por IPs (p.exmeplo: offices -> IPs destes servidores, dropbox), machine learning de primeiro nivel - classificação, bytes de upload e download, racios, média, mediana - para dividir nas 3 classes de tamanho dos dados (base nos padrões de dados, p.e. com arvores de decisão) 
+Primeiros minutos (dados por minuto)
+
+Estatisticas dos carateres
+
+Servidor externo, upload de ficheiro (Mega mau)
+
+Algoritmos não supervisionados - periodicidade, intervalos entre picos, ensinar o que é o bom, no 2º nível
