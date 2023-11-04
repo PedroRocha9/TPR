@@ -38,7 +38,7 @@ Pequenos Kbs - Browsing simples vs KeyLogging
 Médios Mbs - Rede social com imagem e video vs images sent
 Grandes 100Mbs - Gbs - upload/download para google drive (atividade humano vs data exfiltration)
 Streaming - several picos seguidos de silêncios (zoom, youtube, etc): upload, download
-		vs. roubo de imagens
+		vs. roubo de imagens / webcam surveilance
 		
 		
 Fluxos not recommended
