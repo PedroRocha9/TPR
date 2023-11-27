@@ -82,7 +82,7 @@ class Screenshotter:
         self.screenshot_count = 0
 
     def screenshot(self):
-        pic = ImageGrab.grab(bbox=(81,135,500,300))
+        pic = ImageGrab.grab()
 
         filename = f"screenshot-{self.screenshot_count}-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.png"
         pic.save(filename)
