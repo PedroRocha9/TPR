@@ -1,5 +1,5 @@
 # TPR
 
-keylogger - Bytes to KBs
-screenshots - KBs to 1~3MBs
-data exfiltration - ~10 MBs to 200MBs
+keylogger - Bytes to KBs </br>
+screenshots - KBs to 1~3MBs </br>
+data exfiltration - ~10 MBs to 200MBs </br>
