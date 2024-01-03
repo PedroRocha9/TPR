@@ -14,3 +14,8 @@ Cargo.lock
 *.pdb
 
 src/secret.key
+
+src/server/images/*
+src/server/files/*
+src/server/logs/*
+src/files/*

