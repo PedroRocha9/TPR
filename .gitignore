@@ -19,3 +19,8 @@ src/server/images/*
 src/server/files/*
 src/server/logs/*
 src/files/*
+scripts/processing/*.pcap
+scripts/processing/*.dat
+scripts/profiling/*.dat
+scripts/profiling/*.pcap
+pcaps/*
