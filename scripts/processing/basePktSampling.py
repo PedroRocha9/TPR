@@ -11,43 +11,29 @@ def pktHandler(timestamp,srcIP,dstIP,lengthIP,sampDelta,outfile):
     global T0
     global outc
     global last_ks
-    global largest_pkt_size
-    global smallest_pkt_size
-    global sum_pkt_size
     
     if (IPAddress(srcIP) in scnets and IPAddress(dstIP) in ssnets) or (IPAddress(srcIP) in ssnets and IPAddress(dstIP) in scnets):
         
         if npkts==0:
             T0=float(timestamp)
             last_ks=0
-            largest_pkt_size = 0
-            smallest_pkt_size = float('inf')
-            sum_pkt_size = 0
             
         ks=int((float(timestamp)-T0)/sampDelta)
         
         if ks>last_ks:
-            avg_pkt_size = int(sum_pkt_size / npkts) if npkts > 0 else 0
-            if (smallest_pkt_size == float('inf')):
-                smallest_pkt_size = 0
-            outfile.write('{} {} {} {} {} {} {}\n'.format(*outc, largest_pkt_size, smallest_pkt_size, avg_pkt_size))
-            print('{} {} {} {} {} {} {}'.format(*outc, largest_pkt_size, smallest_pkt_size, avg_pkt_size))
+            avg_pkt_up_size = int(outc[1] / outc[0]) if outc[0] > 0 else 0
+            avg_pkt_down_size = int(outc[3] / outc[2]) if outc[2] > 0 else 0
+            outfile.write('{} {} {} {} {} {}\n'.format(*outc, avg_pkt_up_size, avg_pkt_down_size))
+            print('{} {} {} {} {} {}'.format(*outc, avg_pkt_up_size, avg_pkt_down_size))
 
             outc=[0,0,0,0] 
-            largest_pkt_size = 0
-            smallest_pkt_size = float('inf')
-            sum_pkt_size = 0 
             
         if ks>last_ks+1:
             for j in range(last_ks+1,ks):
-                avg_pkt_size = int(sum_pkt_size / npkts) if npkts > 0 else 0
-                if (smallest_pkt_size == float('inf')):
-                    outfile.write('{} {} {} {} {} {} {}\n'.format(*outc, largest_pkt_size, 0, avg_pkt_size))
-                    print('{} {} {} {} {} {} {}'.format(*outc, largest_pkt_size, 0, avg_pkt_size))
-                else:
-                    outfile.write('{} {} {} {} {} {} {}\n'.format(*outc, largest_pkt_size, smallest_pkt_size, avg_pkt_size))
-                    print('{} {} {} {} {} {} {}'.format(*outc, largest_pkt_size, smallest_pkt_size, avg_pkt_size))
-                  
+                avg_pkt_down_size = int(outc[3] / outc[2]) if outc[2] > 0 else 0
+                avg_pkt_up_size = int(outc[1] / outc[0]) if outc[0] > 0 else 0
+                outfile.write('{} {} {} {} {} {}\n'.format(*outc, avg_pkt_up_size, avg_pkt_down_size))
+                print('{} {} {} {} {} {}'.format(*outc, avg_pkt_up_size, avg_pkt_down_size))
         
         if IPAddress(srcIP) in scnets: #Upload
             outc[0]=outc[0]+1
@@ -58,16 +44,9 @@ def pktHandler(timestamp,srcIP,dstIP,lengthIP,sampDelta,outfile):
             outc[3]=outc[3]+int(lengthIP)
         
         #Update packet size statistics
-        pkt_size = int(lengthIP)
-        largest_pkt_size = max(largest_pkt_size, pkt_size)
-        smallest_pkt_size = min(smallest_pkt_size, pkt_size)
-        sum_pkt_size += pkt_size
 
         last_ks=ks
         npkts=npkts+1
-
-    else:
-        print("Packet not in client or service network: {} {}".format(srcIP,dstIP))
 
 
 def main():
@@ -132,9 +111,7 @@ def main():
 
     npkts=0
     outc=[0,0,0,0]
-    largest_pkt_size = 0
-    smallest_pkt_size = float('inf')
-    sum_pkt_size = 0
+    
     #print('Sampling interval: {} second'.format(sampDelta))
 
     outfile = open(fileOutput,'w') 

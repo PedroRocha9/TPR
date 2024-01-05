@@ -8,7 +8,6 @@ import os
 def extractStats(data):
     nSamp=data.shape
     print(data)
-
     M1=np.mean(data,axis=0)
     Md1=np.median(data,axis=0)
     Std1=np.std(data,axis=0)
