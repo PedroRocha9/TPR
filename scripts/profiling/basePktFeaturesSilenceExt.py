@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
-import os
+import os, sys
 
 
 def extractStats(data):
@@ -17,30 +17,34 @@ def extractStats(data):
     features=np.hstack((M1,Md1,Std1))
     return(features)
 
-def extractStatsAdv(data,threshold=0):
+def extractStatsAdv(data,ignoreSilence,threshold=0):
     nSamp=data.shape
-    print(data)
+
 
     M1=np.mean(data,axis=0)
     Md1=np.median(data,axis=0)
     Std1=np.std(data,axis=0)
 #   p=[75,90,95,98]
 #   Pr1=np.array(np.percentile(data,p,axis=0))
+    
+    if not ignoreSilence:
 
-    silence,activity=extratctSilenceActivity(data,threshold)
-    
-    if len(silence)>0:
-        silence_faux=np.array([len(silence),np.mean(silence),np.std(silence)])
-    else:
-        silence_faux=np.zeros(3)
+        silence,activity=extratctSilenceActivity(data,threshold)
         
-    # if len(activity)>0:
-        # activity_faux=np.array([len(activity),np.mean(activity),np.std(activity)])
-    # else:
-        # activity_faux=np.zeros(3)
-    # activity_features=np.hstack((activity_features,activity_faux))  
-    
-    features=np.hstack((M1,Md1,Std1,silence_faux))
+        if len(silence)>0:
+            silence_faux=np.array([len(silence),np.mean(silence),np.std(silence)])
+        else:
+            silence_faux=np.zeros(3)
+            
+        # if len(activity)>0:
+            # activity_faux=np.array([len(activity),np.mean(activity),np.std(activity)])
+        # else:
+            # activity_faux=np.zeros(3)
+        # activity_features=np.hstack((activity_features,activity_faux))  
+        
+        features=np.hstack((M1,Md1,Std1,silence_faux))
+    else:
+        features=np.hstack((M1, Md1, Std1))
     return(features)
 
 def extratctSilenceActivity(data,threshold=0):
@@ -62,21 +66,21 @@ def extratctSilenceActivity(data,threshold=0):
     return(s,a)
 
 
-def seqObsWindow(data,lengthObsWindow):
-    iobs=0
-    nSamples,nMetrics=data.shape
-    while iobs*lengthObsWindow<nSamples-lengthObsWindow:
-        obsFeatures=np.array([])
-        for m in np.arange(nMetrics):
-            wmFeatures=extractStatsAdv(data[iobs*lengthObsWindow:(iobs+1)*lengthObsWindow,m])
-            obsFeatures=np.hstack((obsFeatures,wmFeatures))
-        iobs+=1
+# def seqObsWindow(data,lengthObsWindow):
+#     iobs=0
+#     nSamples,nMetrics=data.shape
+#     while iobs*lengthObsWindow<nSamples-lengthObsWindow:
+#         obsFeatures=np.array([])
+#         for m in np.arange(nMetrics):
+#             wmFeatures=extractStatsAdv(data[iobs*lengthObsWindow:(iobs+1)*lengthObsWindow,m])
+#             obsFeatures=np.hstack((obsFeatures,wmFeatures))
+#         iobs+=1
         
-        if 'allFeatures' not in locals():
-            allFeatures=obsFeatures.copy()
-        else:
-            allFeatures=np.vstack((allFeatures,obsFeatures))
-    return(allFeatures)
+#         if 'allFeatures' not in locals():
+#             allFeatures=obsFeatures.copy()
+#         else:
+#             allFeatures=np.vstack((allFeatures,obsFeatures))
+#     return(allFeatures)
 
         
 def slidingObsWindow(data,lengthObsWindow,slidingValue):
@@ -85,10 +89,12 @@ def slidingObsWindow(data,lengthObsWindow,slidingValue):
     while iobs*slidingValue<nSamples-lengthObsWindow:
         obsFeatures=np.array([])
         for m in np.arange(nMetrics):
-            wmFeatures=extractStatsAdv(data[iobs*slidingValue:iobs*slidingValue+lengthObsWindow,m])
+            ignoreSilence = False
+            if(m==4 or m==5):
+                ignoreSilence =True
+            wmFeatures=extractStatsAdv(data[iobs*slidingValue:iobs*slidingValue+lengthObsWindow,m], ignoreSilence=ignoreSilence)
             obsFeatures=np.hstack((obsFeatures,wmFeatures))
         iobs+=1
-        
         if 'allFeatures' not in locals():
             allFeatures=obsFeatures.copy()
         else:
@@ -113,6 +119,7 @@ def slidingObsWindow(data,lengthObsWindow,slidingValue):
 #     return(allFeatures)
 
 def main():
+    np.set_printoptions(suppress=True)
     parser=argparse.ArgumentParser()
     parser.add_argument('-i', '--input', nargs='?',required=True, help='input file')
     parser.add_argument('-m', '--method', nargs='?',required=False, help='obs. window creation method',default=2)
@@ -126,14 +133,14 @@ def main():
     slidingValue=int(args.slide)
         
     data=np.loadtxt(fileInput,dtype=int)
-    if method==1:
+    if method==1:   
         fname=''.join(fileInput.split('.')[:-1])+"_features_m{}_w{}".format(method,lengthObsWindow)
     else:
         fname=''.join(fileInput.split('.')[:-1])+"_features_m{}_w{}_s{}".format(method,lengthObsWindow,slidingValue)
     
     if method==1:
         print("\n\n### SEQUENTIAL Observation Windows with Length {} ###".format(lengthObsWindow[0]))
-        features=seqObsWindow(data,lengthObsWindow[0])
+        # features=seqObsWindow(data,lengthObsWindow[0])
         print(features)
         print(fname)
         np.savetxt(fname,features,fmt='%d')
