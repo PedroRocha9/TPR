@@ -61,10 +61,10 @@ plt.ion()
 nfig=1
 
 ## -- 2 -- ##
-features_files=np.loadtxt("./normal_file_uploadingAllF.dat")
-features_browsing=np.loadtxt("./normal_google_browsingAllF.dat")
-features_images=np.loadtxt("./normal_image_uploadingAllF.dat")
-features_streaming=np.loadtxt("./normal_zoom_webcamAllF.dat")
+features_files=np.loadtxt("./55min_filesAllF.dat")
+features_browsing=np.loadtxt("./52min_browsingAllF.dat")
+features_images=np.loadtxt("./45min_imageAllF.dat")
+features_streaming=np.loadtxt("./50min_zoomAllF.dat")
 
 
 oClass_files=np.ones((len(features_files),1))*0
@@ -88,7 +88,7 @@ oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
 
 ## -- 3 -- ##
 #:i - For anomaly detection
-percentage=0.5
+percentage=0.7
 pFiles=int(len(features_files)*percentage)
 trainFeatures_files=features_files[:pFiles,:]
 
