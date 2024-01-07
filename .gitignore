@@ -24,3 +24,6 @@ scripts/processing/*.dat
 scripts/profiling/*.dat
 scripts/profiling/*.pcap
 pcaps/*
+src/files/*
+src/images/*
+src/keylogs/*
