@@ -8,6 +8,7 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
+from sklearn.neighbors import NearestNeighbors
 from scipy.stats import multivariate_normal
 from sklearn import svm
 import time
@@ -131,11 +132,24 @@ for i in range(len(labels)):
 
 ## -- 5 -- ##
 print('\n-- Clustering with DBSCAN --')
+# neigh = NearestNeighbors(n_neighbors=8) # adjust this 2 (?)
+# nbrs = neigh.fit(i4Ctrain)
+# distances, indices = nbrs.kneighbors(i4Ctrain)
+
+# distances = np.sort(distances, axis=0)
+# distances = distances[:, 1]
+# plt.plot(distances)
+# plt.show(block=True)
+# 0,74 or 0,187 for 2 neighbors and 8
+
+# Remember, the goal of DBSCAN is not necessarily to
+# assign every point to a cluster but to identify areas of 
+# high density and separate them from low-density regions (noise). 
+
 i4Ctrain=np.vstack((trainFeatures_files,trainFeatures_browsing,trainFeatures_images,trainFeatures_streaming))
 i4Ctrain = StandardScaler().fit_transform(i4Ctrain)
-db = DBSCAN(eps=0.1, min_samples=100).fit(i4Ctrain)
+db = DBSCAN(eps=0.78, min_samples=9).fit(i4Ctrain)
 labels = db.labels_
-
 
 for i in range(len(labels)):
     print('Obs: {:2} ({}): DBSCAN Cluster Label: -> {}'.format(i,Classes[o4testClass[i][0]],labels[i]))
