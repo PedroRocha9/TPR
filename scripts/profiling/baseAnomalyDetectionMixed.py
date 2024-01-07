@@ -43,19 +43,6 @@ def logplotFeatures(features,oClass,f1index=0,f2index=1):
 
     plt.show()
     waitforEnter()
-    
-## -- 11 -- ##
-def distance(c,p):
-    s=0
-    n=0
-    for i in range(len(c)):
-        if c[i]>0:
-            s+=np.square((p[i]-c[i])/c[i])
-            n+=1
-    
-    return(np.sqrt(s/n))
-        
-    #return(np.sqrt(np.sum(np.square((p-c)/c))))
 
 ########### Main Code #############
 Classes={0:'Files',1:'Browsing',2:'Images', 3:'Streaming', 4:'Rat'}
@@ -77,10 +64,51 @@ oClass_streaming=np.ones((len(features_streaming),1))*3
 oClass_rat=np.ones((len(features_rat),1))*4
 
 
-features=np.vstack((features_files,features_browsing,features_images,features_streaming))
-oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
+features=np.vstack((features_files,features_browsing,features_images,features_streaming, features_rat))
+oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming,oClass_rat))
 # features=np.vstack((features_yt,features_browsing,features_mining))
 # oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
+
+## PCA ##
+
+# Apply PCA to each dataset individually and plot
+def plot_pca(data, title):
+    scaler = StandardScaler()
+    standardized_data = scaler.fit_transform(data)
+    pca = PCA(n_components=2)
+    components = pca.fit_transform(standardized_data)
+
+    plt.scatter(components[:, 0], components[:, 1])
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.title(title)
+
+# Assuming features and oClass are already defined
+scalar = StandardScaler()
+features_scaled = scalar.fit_transform(features)
+
+pca = PCA(n_components=2)
+features_pca = pca.fit_transform(features_scaled)
+
+plt.figure(figsize=(8,6))
+
+# Define class labels
+class_labels = ['Files', 'Browsing', 'Images', 'Streaming', 'RAT']
+colors = ['red', 'green', 'blue', 'purple', 'yellow']  # Define a color for each class
+
+# Scatter plot
+for i, label in enumerate(class_labels):
+    plt.scatter(features_pca[oClass[:,0] == i, 0], features_pca[oClass[:,0] == i, 1], 
+                label=label, color=colors[i])
+
+plt.xlabel('First Principal Component')
+plt.ylabel('Second Principal Component')
+
+# Add a legend
+plt.legend(title="Classes")
+
+plt.show(block=True)
+waitforEnter()
 
 # print('Train Silence Features Size:',features.shape)
 # plt.figure(2)
