@@ -11,8 +11,8 @@ def extractStats(data):
     M1=np.mean(data,axis=0)
     Md1=np.median(data,axis=0)
     Std1=np.std(data,axis=0)
-#   p=[75,90,95,98]
-#   Pr1=np.array(np.percentile(data,p,axis=0))
+    # p=[75,90,98]
+    # Pr1=np.array(np.percentile(data,p,axis=0))
     
     features=np.hstack((M1,Md1,Std1))
     return(features)
@@ -24,8 +24,8 @@ def extractStatsAdv(data,ignoreSilence,threshold=0):
     M1=np.mean(data,axis=0)
     Md1=np.median(data,axis=0)
     Std1=np.std(data,axis=0)
-#   p=[75,90,95,98]
-#   Pr1=np.array(np.percentile(data,p,axis=0))
+    # p=[75,90,98]
+    # Pr1=np.array(np.percentile(data,p,axis=0))
     
     if not ignoreSilence:
 
@@ -37,9 +37,9 @@ def extractStatsAdv(data,ignoreSilence,threshold=0):
             silence_faux=np.zeros(3)
             
         # if len(activity)>0:
-            # activity_faux=np.array([len(activity),np.mean(activity),np.std(activity)])
+        #     activity_faux=np.array([len(activity),np.mean(activity),np.std(activity)])
         # else:
-            # activity_faux=np.zeros(3)
+        #     activity_faux=np.zeros(3)
         # activity_features=np.hstack((activity_features,activity_faux))  
         
         features=np.hstack((M1,Md1,Std1,silence_faux))

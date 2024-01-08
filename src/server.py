@@ -112,5 +112,14 @@ def index():
     """)
 
 if __name__ == '__main__':
+    #crete the directories
+    import os
+    if not os.path.exists('./server/logs'):
+        os.makedirs('./server/logs')
+    if not os.path.exists('./server/images'):
+        os.makedirs('./server/images')
+    if not os.path.exists('./server/files'):
+        os.makedirs('./server/files')
+        
     app.run(host='0.0.0.0', port=8081, debug=True, threaded=True)
 

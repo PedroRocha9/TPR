@@ -50,11 +50,11 @@ plt.ion()
 nfig=1
 
 ## -- 2 -- ##
-features_files=np.loadtxt("./55min_filesAllF.dat")
-features_browsing=np.loadtxt("./52min_browsingAllF.dat")
-features_images=np.loadtxt("./45min_imageAllF.dat")
-features_streaming=np.loadtxt("./50min_zoomAllF.dat")
-features_rat=np.loadtxt("./45min_ratAllF.dat")
+features_files=np.loadtxt("./55min_filesAll30F.dat")
+features_browsing=np.loadtxt("./52min_browsingAll30F.dat")
+features_images=np.loadtxt("./51min_imageAll30F.dat")
+features_streaming=np.loadtxt("./50min_zoomAll30F.dat")
+features_rat=np.loadtxt("./45min_ratV3All30F.dat")
 
 
 oClass_files=np.ones((len(features_files),1))*0
@@ -65,7 +65,7 @@ oClass_rat=np.ones((len(features_rat),1))*4
 
 
 features=np.vstack((features_files,features_browsing,features_images,features_streaming, features_rat))
-oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming,oClass_rat))
+oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming, oClass_rat))
 # features=np.vstack((features_yt,features_browsing,features_mining))
 # oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
 
@@ -93,7 +93,7 @@ features_pca = pca.fit_transform(features_scaled)
 plt.figure(figsize=(8,6))
 
 # Define class labels
-class_labels = ['Files', 'Browsing', 'Images', 'Streaming', 'RAT']
+class_labels = ['Files', 'Browsing', 'Images', 'Streaming', 'Rat']
 colors = ['red', 'green', 'blue', 'purple', 'yellow']  # Define a color for each class
 
 # Scatter plot

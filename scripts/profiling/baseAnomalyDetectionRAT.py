@@ -63,11 +63,11 @@ plt.ion()
 nfig=1
 
 ## -- 2 -- ##
-features_files=np.loadtxt("./55min_filesAllF.dat")
-features_browsing=np.loadtxt("./52min_browsingAllF.dat")
-features_images=np.loadtxt("./45min_imageAllF.dat")
-features_streaming=np.loadtxt("./50min_zoomAllF.dat")
-features_rat=np.loadtxt("./45min_ratAllF.dat")
+features_files=np.loadtxt("./55min_filesAll30F.dat")
+features_browsing=np.loadtxt("./52min_browsingAll30F.dat")
+features_images=np.loadtxt("./51min_imageAll30F.dat")
+features_streaming=np.loadtxt("./50min_zoomAll30F.dat")
+features_rat=np.loadtxt("./45min_ratV3All30F.dat")
 
 
 oClass_files=np.ones((len(features_files),1))*0
@@ -79,16 +79,6 @@ oClass_rat=np.ones((len(features_rat),1))*4
 
 features=np.vstack((features_files,features_browsing,features_images,features_streaming))
 oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
-# features=np.vstack((features_yt,features_browsing,features_mining))
-# oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
-
-# print('Train Silence Features Size:',features.shape)
-# plt.figure(2)
-# plotFeatures(features,oClass,4,10)
-# plt.figure(3)
-# plotFeatures(features,oClass,0,7)
-# plt.figure(4)
-# plotFeatures(features,oClass,2,8)
 
 ## -- 3 -- ##
 #:i - For anomaly detection
@@ -105,16 +95,19 @@ trainFeatures_images=features_images
 pStream=int(len(features_streaming)*percentage)
 trainFeatures_streaming=features_streaming
 
+rat_percentage=0.5
+pRat=int(len(features_rat)*rat_percentage)
+
 # #:iii For anomaly detection and classification using last 50% of data
 testFeatures_files=features_files
 testFeatures_browsing=features_browsing
 testFeatures_images=features_images
 testFeatures_streaming=features_streaming
-testFeatures_rat=features_rat
+testFeatures_rat=features_rat[pRat:,:]
 
 
 i5Atest=np.vstack((testFeatures_files,testFeatures_browsing,testFeatures_images,testFeatures_streaming, testFeatures_rat))
-o5testClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming, oClass_rat))
+o5testClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming, oClass_rat[pRat:,:]))
 
 print('\n-- Anomaly Detection based on One Class Support Vector Machines--')
 i4train=np.vstack((trainFeatures_files,trainFeatures_browsing,trainFeatures_images,trainFeatures_streaming))
@@ -260,7 +253,7 @@ for i in range(nObsTest):
     elif (anomaly_status=="OK"):
         false_neg+=1
 
-    # print('Obs: {:2} ({:<8}): GMM Result: {}'.format(i,Classes[o5testClass[i][0]],anomaly_status))
+    # print('Obs: {:2} ({:<8}): GMM Result: {}'.format(i,"RAT",anomaly_status))
 
 print('\nTrue Positives: {} | False Positives: {} | False Negatives: {} | True Negatives: {}'.format(true_pos,false_pos,false_neg,true_neg))
 #percentages
@@ -312,7 +305,7 @@ for i in range(len(if_predictions)):
     elif (if_predictions[i]=="OK"):
         false_neg+=1
 
-    # print('Obs: {:2} ({:<8}): IF Result: {}'.format(i,Classes[o5testClass[i][0]],if_predictions[i]))
+    # print('Obs: {:2} ({:<8}): IF Result: {}'.format(i,"RAT",if_predictions[i]))
 
 print('\nTrue Positives: {} | False Positives: {} | False Negatives: {} | True Negatives: {}'.format(true_pos,false_pos,false_neg,true_neg))
 #percentages

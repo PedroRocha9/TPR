@@ -63,11 +63,11 @@ plt.ion()
 nfig=1
 
 ## -- 2 -- ##
-features_files=np.loadtxt("./55min_filesAllF.dat")
-features_browsing=np.loadtxt("./52min_browsingAllF.dat")
-features_images=np.loadtxt("./45min_imageAllF.dat")
-features_streaming=np.loadtxt("./50min_zoomAllF.dat")
-features_rat=np.loadtxt("./45min_ratAllF.dat")
+features_files=np.loadtxt("./55min_filesAll30F.dat")
+features_browsing=np.loadtxt("./52min_browsingAll30F.dat")
+features_images=np.loadtxt("./51min_imageAll30F.dat")
+features_streaming=np.loadtxt("./50min_zoomAll30F.dat")
+features_rat=np.loadtxt("./45min_ratV3All30F.dat")
 
 
 oClass_files=np.ones((len(features_files),1))*0
@@ -79,16 +79,6 @@ oClass_rat=np.ones((len(features_rat),1))*4
 
 features=np.vstack((features_files,features_browsing,features_images,features_streaming))
 oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
-# features=np.vstack((features_yt,features_browsing,features_mining))
-# oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
-
-# print('Train Silence Features Size:',features.shape)
-# plt.figure(2)
-# plotFeatures(features,oClass,4,10)
-# plt.figure(3)
-# plotFeatures(features,oClass,0,7)
-# plt.figure(4)
-# plotFeatures(features,oClass,2,8)
 
 ## -- 3 -- ##
 #:i - For anomaly detection
@@ -110,6 +100,21 @@ testFeatures_files=features_files[pFiles:,:]
 testFeatures_browsing=features_browsing[pBrowse:,:]
 testFeatures_images=features_images[pImages:,:]
 testFeatures_streaming=features_streaming[pStream:,:]
+
+# rat_percentage=0.25
+# pRat=int(len(features_rat)*rat_percentage)
+# testFeatures_rat=features_rat[pRat:,:]
+# choose the random 25% of the data (10% + 10% + 5%)
+# rat_percentage1=0.1
+# rat_percentage2=0.1
+# rat_percentage3=0.05
+# pRat1=int(len(features_rat)*rat_percentage1)
+# pRat2=int(len(features_rat)*rat_percentage2)
+# pRat3=int(len(features_rat)*rat_percentage3)
+# testFeatures_rat1=features_rat[0:pRat1,:]
+# testFeatures_rat2=features_rat[pRat1*2:pRat2,:]
+# testFeatures_rat3=features_rat[:pRat3,:]
+# testFeatures_rat=np.vstack((testFeatures_rat1,testFeatures_rat2,testFeatures_rat3))
 testFeatures_rat=features_rat
 
 o5testClass=np.vstack((oClass_files[pFiles:,:],oClass_browsing[pBrowse:,:],oClass_images[pImages:,:],oClass_streaming[pStream:,:],oClass_rat))
