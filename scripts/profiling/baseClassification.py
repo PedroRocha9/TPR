@@ -16,46 +16,6 @@ import sys
 import warnings
 warnings.filterwarnings('ignore')
 
-
-def waitforEnter(fstop=False):
-    if fstop:
-        if sys.version_info[0] == 2:
-            raw_input("Press ENTER to continue.")
-        else:
-            input("Press ENTER to continue.")
-            
-## -- 3 -- ##
-def plotFeatures(features,oClass,f1index=0,f2index=1):
-    nObs,nFea=features.shape
-    colors=['b','g','r']
-    for i in range(nObs):
-        plt.plot(features[i,f1index],features[i,f2index],'o'+colors[int(oClass[i])])
-
-    plt.show()
-    waitforEnter()
-    
-def logplotFeatures(features,oClass,f1index=0,f2index=1):
-    nObs,nFea=features.shape
-    colors=['b','g','r']
-    for i in range(nObs):
-        plt.loglog(features[i,f1index],features[i,f2index],'o'+colors[int(oClass[i])])
-
-    plt.show()
-    waitforEnter()
-    
-## -- 11 -- ##
-def distance(c,p):
-    s=0
-    n=0
-    for i in range(len(c)):
-        if c[i]>0:
-            s+=np.square((p[i]-c[i])/c[i])
-            n+=1
-    
-    return(np.sqrt(s/n))
-        
-    #return(np.sqrt(np.sum(np.square((p-c)/c))))
-
 ########### Main Code #############
 Classes={0:'Files',1:'Browsing',2:'Images', 3:'Streaming'}
 plt.ion()
@@ -76,19 +36,7 @@ oClass_streaming=np.ones((len(features_streaming),1))*3
 
 features=np.vstack((features_files,features_browsing,features_images,features_streaming))
 oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
-# features=np.vstack((features_yt,features_browsing,features_mining))
-# oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
 
-# print('Train Silence Features Size:',features.shape)
-# plt.figure(2)
-# plotFeatures(features,oClass,4,10)
-# plt.figure(3)
-# plotFeatures(features,oClass,0,7)
-# plt.figure(4)
-# plotFeatures(features,oClass,2,8)
-
-## -- 3 -- ##
-#:i - For anomaly detection
 percentage=0.5
 pFiles=int(len(features_files)*percentage)
 trainFeatures_files=features_files[:pFiles,:]
