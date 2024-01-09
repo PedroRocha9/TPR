@@ -16,7 +16,6 @@ import sys
 import warnings
 warnings.filterwarnings('ignore')
 
-
 def waitforEnter(fstop=False):
     if fstop:
         if sys.version_info[0] == 2:
@@ -67,6 +66,9 @@ features_browsing=np.loadtxt("./52min_browsingAllF.dat")
 features_images=np.loadtxt("./45min_imageAllF.dat")
 features_streaming=np.loadtxt("./50min_zoomAllF.dat")
 
+features=np.loadtxt("./45min_good-UA_mixed0.1AllF.dat")
+# features=np.loadtxt("./45min_good-UA_mixed1.0.dat")
+
 
 oClass_files=np.ones((len(features_files),1))*0
 oClass_browsing=np.ones((len(features_browsing),1))*1
@@ -74,7 +76,6 @@ oClass_images=np.ones((len(features_images),1))*2
 oClass_streaming=np.ones((len(features_streaming),1))*3
 
 
-features=np.vstack((features_files,features_browsing,features_images,features_streaming))
 oClass=np.vstack((oClass_files,oClass_browsing,oClass_images,oClass_streaming))
 # features=np.vstack((features_yt,features_browsing,features_mining))
 # oClass=np.vstack((oClass_yt,oClass_browsing,oClass_mining))
@@ -122,12 +123,12 @@ o4testClass=np.vstack((oClass_files[pFiles:],oClass_browsing[pBrowse:],oClass_im
 ## -- 4 -- ##
 print('\n-- Clustering with K-Means --')
 kmeans = KMeans(n_clusters=4, random_state=0, n_init="auto")    
-i4Ctrain=np.vstack((trainFeatures_files,trainFeatures_browsing,trainFeatures_images,trainFeatures_streaming))
+i4Ctrain=np.vstack(features)
 i4Ctrain = StandardScaler().fit_transform(i4Ctrain)
 labels= kmeans.fit_predict(i4Ctrain)
 
 for i in range(len(labels)):
-    print('Obs: {:2} ({}): K-Means Cluster Label: -> {}'.format(i,Classes[o4testClass[i][0]],labels[i]))
+    print('Obs: {:2} ({}): K-Means Cluster Label: -> {}'.format(i,"Normal",labels[i]))
 
 ## -- 5 -- ##
 print('\n-- Clustering with DBSCAN --')
@@ -145,7 +146,7 @@ print('\n-- Clustering with DBSCAN --')
 # assign every point to a cluster but to identify areas of 
 # high density and separate them from low-density regions (noise). 
 
-i4Ctrain=np.vstack((trainFeatures_files,trainFeatures_browsing,trainFeatures_images,trainFeatures_streaming))
+i4Ctrain=np.vstack((features))
 i4Ctrain = StandardScaler().fit_transform(i4Ctrain)
 db = DBSCAN(eps=0.78, min_samples=9).fit(i4Ctrain)
 labels = db.labels_
