@@ -23,6 +23,7 @@ scripts/processing/*.pcap
 scripts/processing/*.dat
 scripts/profiling/*.dat
 scripts/profiling/*.pcap
+scripts/profiling/W300_S20/
 pcaps/*
 src/files/*
 src/images/*
