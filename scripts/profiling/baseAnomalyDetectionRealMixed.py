@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import scipy.stats as stats
 import scipy.signal as signal
@@ -61,7 +62,8 @@ pNormal=int(len(features_normal)*percentage)
 trainFeatures_Normal=features_normal[0:pNormal,:]
 
 #TEST
-mixed_percentage=0.25   
+# mixed_percentage=0.25
+mixed_percentage=1.0   
 pMixed=int(len(features_mixed)*mixed_percentage)
 
 testFeatures_normal=features_normal[pNormal:,:]
@@ -140,8 +142,6 @@ plot_confusion(true_pos_perc, false_pos_perc, true_neg_perc, false_neg_perc, "RB
 # plot_confusion(true_pos_perc, false_pos_perc, true_neg_perc, false_neg_perc, "RBF Kernel")
 
 
-
-## -- 9 -- ##
 from sklearn.mixture import GaussianMixture
 logger.info('\n-- Anomaly Detection based on Gaussian Mixture Models --')
 i4train=np.vstack((trainFeatures_Normal))
@@ -232,3 +232,72 @@ print("Precision: {:.4f}".format(true_pos/(true_pos+false_pos)))
 print("Recall: {:.4f}".format(true_pos/(true_pos+false_neg)))
 print("F1 Score: {:.4f}".format(2*(true_pos/(true_pos+false_pos))*(true_pos/(true_pos+false_neg))/((true_pos/(true_pos+false_pos))+(true_pos/(true_pos+false_neg)))))
 plot_confusion(true_pos/(true_pos+false_neg), false_pos/(true_neg+false_pos), true_neg/(false_pos+true_neg), false_neg/(false_neg+true_pos), "Isolation Forest")
+
+# Ensemble - Bagging
+logger.info('\n-- Anomaly Detection based on Ensemble Bagging--')
+from sklearn.ensemble import BaggingClassifier
+
+# Train each model
+iforest = IsolationForest(n_estimators=n_estimators, contamination=contamination, random_state=42).fit(i4train)
+gmm = GaussianMixture(n_components=4, covariance_type='full', random_state=0).fit(i4train)
+# rbf = svm.OneClassSVM(gamma='scale',kernel='rbf',nu=nu).fit(i4train)
+
+# Make predictions
+iforest_decisions = iforest.predict(i5Atest)
+gmm_scores = gmm.score_samples(i5Atest)
+# rbf_decisions = rbf.predict(i5Atest)
+rbf_decisions = copy.deepcopy(L2)
+
+# Normalize GMM scores to be between -1 and 1, assuming that lower scores are more anomalous
+threshold=-1000
+
+anomalies_gm = log_likelihood < threshold
+anomalies_gm_labels = np.where(anomalies_gm, -1, 1)
+
+# Combine predictions
+combine_predictions = []
+for i in range(len(i5Atest)):
+    votes = anomalies_gm_labels[i] + iforest_decisions[i] + rbf_decisions[i]
+    # votes = anomalies_gm_labels[i] + rbf_decisions[i]
+    combine_prediction = -1 if votes < 0 else 1
+    combine_predictions.append(combine_prediction)
+
+# Convert labels to a more readable format
+ensemble_results = {1: "OK", -1: "Anomaly"}
+combine_predictions = [ensemble_results[label] for label in combine_predictions]
+
+true_pos=0
+false_pos=0
+true_neg=0
+false_neg=0
+
+for i in range(len(combine_predictions)):
+    if (combine_predictions[i]=="Anomaly" and oTestClass[i][0] == 1):
+        true_pos+=1
+    elif (combine_predictions[i]=="Anomaly" and oTestClass[i][0] != 1):
+        false_pos+=1
+    elif (combine_predictions[i]=="OK" and oTestClass[i][0] == 1):
+        false_neg+=1
+    elif (combine_predictions[i]=="OK" and oTestClass[i][0] != 1):
+        true_neg+=1
+
+    # print('Obs: {:2} ({:<8}): IF Result: {}'.format(i,Classes[o5testClass[i][0]],if_predictions[i]))
+        
+print('\nTrue Positives: {} | False Positives: {} | False Negatives: {} | True Negatives: {}'.format(true_pos,false_pos,false_neg,true_neg))
+#percentages
+print('True Positives: {:.4f} | False Positives: {:.4f} | False Negatives: {:.4f} | True Negatives: {:.4f}'.format(true_pos/(true_pos+false_neg)*100,false_pos/(true_neg+false_pos)*100,false_neg/(false_neg+true_pos)*100,true_neg/(false_pos+true_neg)*100))
+
+#metrics
+print("\nMetrics")
+print("Accuracy: {:.4f}".format((true_pos+true_neg)/(true_pos+true_neg+false_pos+false_neg)))
+print("Precision: {:.4f}".format(true_pos/(true_pos+false_pos)))
+print("Recall: {:.4f}".format(true_pos/(true_pos+false_neg)))
+print("F1 Score: {:.4f}".format(2*(true_pos/(true_pos+false_pos))*(true_pos/(true_pos+false_neg))/((true_pos/(true_pos+false_pos))+(true_pos/(true_pos+false_neg)))))
+plot_confusion(true_pos/(true_pos+false_neg), false_pos/(true_neg+false_pos), true_neg/(false_pos+true_neg), false_neg/(false_neg+true_pos), "Ensemble Bagging")
+
+# Ensemble - Boosting
+logger.info('\n-- Anomaly Detection based on Ensemble Boosting--')
+from sklearn.ensemble import AdaBoostClassifier
+
+
+
