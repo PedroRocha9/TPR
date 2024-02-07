@@ -45,8 +45,11 @@ nfig=1
 ## -- 2 -- ##
 
 
-features_normal=np.loadtxt("./45min_good-UA_mixed1.0AllF.dat")
-features_mixed = np.loadtxt("./45min_all_mixed1.0AllF.dat")
+# features_normal=np.loadtxt("./45min_good-UA_mixed1.0AllF.dat")
+# features_mixed = np.loadtxt("./45min_all_mixed1.0AllF.dat")
+
+features_normal=np.loadtxt("./45min_good-UA_mixed0.1AllF.dat")
+features_mixed = np.loadtxt("./45min_all_mixed0.1AllF.dat")
 
 
 oClass_normal=np.ones((len(features_normal),1))*0
@@ -295,9 +298,66 @@ print("Recall: {:.4f}".format(true_pos/(true_pos+false_neg)))
 print("F1 Score: {:.4f}".format(2*(true_pos/(true_pos+false_pos))*(true_pos/(true_pos+false_neg))/((true_pos/(true_pos+false_pos))+(true_pos/(true_pos+false_neg)))))
 plot_confusion(true_pos/(true_pos+false_neg), false_pos/(true_neg+false_pos), true_neg/(false_pos+true_neg), false_neg/(false_neg+true_pos), "Ensemble Bagging")
 
-# Ensemble - Boosting
-logger.info('\n-- Anomaly Detection based on Ensemble Boosting--')
-from sklearn.ensemble import AdaBoostClassifier
+# # Ensemble - Bayes Optimal Classifier
+# logger.info('\n-- Anomaly Detection based on Ensemble Bayes Optimal Classifier--')
 
+# from scipy.special import expit  # Sigmoid function
 
+# # Train the Isolation Forest model
+# iforest = IsolationForest(n_estimators=n_estimators, contamination=contamination, random_state=42)
+# iforest.fit(i4train)
+# # Obtain decision scores
+# iforest_scores = iforest.decision_function(i5Atest)
+# # Convert to probabilities using the sigmoid function
+# iforest_probs = expit(iforest_scores)
+# # print("IForest Probs: ", iforest_probs)
 
+# # Train the Gaussian Mixture Model
+# gmm = GaussianMixture(n_components=4, covariance_type='full', random_state=0)
+# gmm.fit(i4train)
+# # Get log probabilities
+# gmm_log_probs = gmm.score_samples(i5Atest)
+# # Convert log probabilities to true probabilities
+# gmm_probs = np.exp(gmm_log_probs)
+# # print("GMM Probs: ", gmm_probs)
+
+# # Assume rbf_decisions are obtained from the One-Class SVM
+# # Normalize SVM decision scores to [0, 1] using the sigmoid function
+# svm_probs = expit(rbf_decisions)
+# # print("SVM Probs: ", svm_probs)
+
+# # Average the probabilities from each model
+# # Here, you can also apply different weights to each model's output if desired
+# average_probs = (iforest_probs + gmm_probs + svm_probs) / 3
+# # print("Average Probs: ", average_probs)
+
+# # This threshold could be tuned based on cross-validation on a validation set
+# threshold = 0.5
+
+# # Make final decision based on the average probabilities
+# final_decisions = np.where(average_probs < threshold, -1, 1)
+
+# # Calculate confusion matrix elements
+# tp = np.sum((final_decisions == -1) & (oTestClass == 1))
+# fp = np.sum((final_decisions == -1) & (oTestClass == 0))
+# tn = np.sum((final_decisions == 1) & (oTestClass == 0))
+# fn = np.sum((final_decisions == 1) & (oTestClass == 1))
+
+# # Calculate performance metrics
+# accuracy = (tp + tn) / (tp + fp + tn + fn)
+# precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+# recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+# f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+# print('\nTrue Positives: {} | False Positives: {} | False Negatives: {} | True Negatives: {}'.format(tp,fp,fn,tn))
+# #percentages
+# print('True Positives: {:.4f} | False Positives: {:.4f} | False Negatives: {:.4f} | True Negatives: {:.4f}'.format(tp/(tp+fn)*100,fp/(tn+fp)*100,fn/(fn+tp)*100,tn/(fp+tn)*100))
+
+# # Display metrics
+# print(f"Accuracy: {accuracy:.4f}")
+# print(f"Precision: {precision:.4f}")
+# print(f"Recall: {recall:.4f}")
+# print(f"F1 Score: {f1_score:.4f}")
+
+# # Assuming you have a function to plot confusion matrix normalized
+# plot_confusion(tp/(tp+fn), fp/(tn+fp), tn/(fp+tn), fn/(fn+tp), "Ensemble Bayes Optimal Classifier")
